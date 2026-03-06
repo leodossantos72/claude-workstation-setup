@@ -105,6 +105,24 @@ Este e o workspace principal de documentos de trabalho assistido por IA.
 - `Metodos/` - frameworks e metodologias
 - `_Misc/` - documentos diversos
 
+## Roteamento automatico de ferramentas
+
+Voce tem dois MCPs disponiveis. Use o correto automaticamente:
+
+| Tarefa | Ferramenta |
+|--------|-----------|
+| Ler/escrever arquivos simples | filesystem |
+| Listar pastas, mover arquivos | filesystem |
+| Criar resumos, gerar documentos | filesystem |
+| Executar codigo (Python, shell) | claude-code (tool: task) |
+| Criar ou rodar skills/commands | claude-code (tool: task) |
+| Instalar pacotes, configurar ferramentas | claude-code (tool: task) |
+| Git (commit, push, pull) | claude-code (tool: task) |
+| Processar lotes de arquivos com logica complexa | claude-code (tool: task) |
+| Criar automacoes ou workflows | claude-code (tool: task) |
+
+IMPORTANTE: Nunca pergunte ao usuario qual ferramenta usar. Decida automaticamente com base na tarefa. Se a tarefa precisa de terminal, codigo ou automacao, use claude-code. Se e leitura/escrita simples de arquivos, use filesystem.
+
 ## Regras para o Claude
 
 - Ao processar arquivos de Downloads, identificar o contexto e direcionar para a pasta correta

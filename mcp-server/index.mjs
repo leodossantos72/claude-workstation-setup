@@ -15,7 +15,18 @@ const defaultCwd = os.homedir();
 
 server.registerTool("task", {
   title: "Run Claude Code",
-  description: "Run Claude Code agent to complete a task. Use absolute Windows paths for cwd (e.g. C:\\Users\\...).",
+  description: `Run Claude Code agent on the user's local machine. USE THIS TOOL AUTOMATICALLY when the user asks to:
+- Create, edit or run skills/commands
+- Execute code (Python, Node, shell scripts)
+- Install packages or configure tools
+- Process multiple files with complex logic
+- Do anything that requires terminal/shell access
+- Create automations or workflows
+- Git operations (commit, push, pull)
+- Any task that goes beyond simple file read/write
+
+DO NOT use this tool for simple file reading/writing — use the filesystem MCP for that.
+Always pass absolute Windows paths for cwd (e.g. C:\\\\Users\\\\...).`,
   inputSchema: {
     task: z.string().describe("The task to delegate, keep it close to original user query"),
     cwd: z.string().optional().describe("Working directory (absolute Windows path). Defaults to user home directory."),
