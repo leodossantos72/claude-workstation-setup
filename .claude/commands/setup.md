@@ -83,7 +83,16 @@ Consultorias/
 Ventures/
 Metodos/
 _Misc/
+_Gerados/
+  documentos/
+  apresentacoes/
+  planilhas/
+  web/
+  marketing/
+  design/
 ```
+
+A pasta _Gerados/ e o destino padrao para arquivos criados por skills quando nao ha contexto de cliente/projeto especifico.
 
 ## 4. Criar CLAUDE.md na raiz de Documentos
 
@@ -104,6 +113,13 @@ Este e o workspace principal de documentos de trabalho assistido por IA.
 - `Ventures/` - negocios proprios / sociedades
 - `Metodos/` - frameworks e metodologias
 - `_Misc/` - documentos diversos
+- `_Gerados/` - arquivos criados por skills (destino padrao quando sem contexto)
+  - `documentos/` - Word, PDF
+  - `apresentacoes/` - PowerPoint, HTML
+  - `planilhas/` - Excel, CSV
+  - `web/` - landing pages, sites
+  - `marketing/` - copies, calendarios
+  - `design/` - imagens, banners
 
 ## Roteamento automatico (skills-first)
 
@@ -145,6 +161,27 @@ Voce tem dois MCPs disponiveis. Use o correto automaticamente:
 Skills instalados (~30): docx, pdf, pptx, xlsx, canvas-design, frontend-design, web-artifacts-builder, brand-guidelines, internal-comms, doc-coauthoring, skill-creator, algorithmic-art, theme-factory, slack-gif-creator, claude-ads (auditoria de anuncios), ad-copy, video-script, content-calendar, commercial-proposal, email-sequence, competitor-analysis, social-media-post, seo-content, landing-page, report-generator, frontend-slides.
 
 IMPORTANTE: Nunca pergunte ao usuario qual ferramenta usar. Decida automaticamente. Se a tarefa envolve gerar arquivos (Word, PDF, Excel, PowerPoint, HTML, imagens), SEMPRE use claude-code — ele tem skills especializados pra isso.
+
+## Onde salvar arquivos gerados
+
+Todo arquivo gerado por skills DEVE ser salvo na pasta Documentos (DOCS_PATH).
+
+Logica de destino:
+1. Se o usuario mencionou um cliente/projeto → Consultorias/{cliente}/
+2. Se mencionou uma venture → Ventures/{projeto}/
+3. Se e generico → _Gerados/
+
+Subpastas por tipo:
+- Documentos (docx, pdf) → {destino}/documentos/
+- Apresentacoes (pptx, html) → {destino}/apresentacoes/
+- Planilhas (xlsx, csv) → {destino}/planilhas/
+- Web (landing pages) → {destino}/web/
+- Marketing (copies, calendarios) → {destino}/marketing/
+- Imagens/Design → {destino}/design/
+
+APOS gerar: informe o caminho completo, mostre conteudo inline se HTML, pergunte se quer ajustes.
+
+Ao usar claude-code, SEMPRE inclua no prompt o caminho absoluto de DOCS_PATH e o destino do arquivo.
 
 ## Regras para o Claude
 
