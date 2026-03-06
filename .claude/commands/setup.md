@@ -1,6 +1,9 @@
 Voce e um agente de setup. Execute TODOS os passos abaixo em sequencia.
 Ao final de cada passo, informe o que foi feito. Se algo falhar, informe o erro e tente uma alternativa.
 
+IMPORTANTE: Todos os caminhos sao detectados dinamicamente. NUNCA use caminhos hardcoded.
+Guarde tudo em variaveis mentais para reutilizar nos passos seguintes.
+
 ## 1. Detectar ambiente
 
 - Identifique o sistema operacional (Windows ou macOS)
@@ -10,8 +13,9 @@ Ao final de cada passo, informe o que foi feito. Se algo falhar, informe o erro 
   - Windows local: ~/Documents ou ~/Documentos
   - macOS: ~/Documents
 - Encontre a pasta Downloads do usuario
-- Guarde os caminhos em variaveis mentais DOCS_PATH e DOWNLOADS_PATH
-- Informe: "Detectei: [SO], Documentos em [caminho], Downloads em [caminho]"
+- Detecte o diretorio atual do repositorio (onde este skill esta rodando) — este e o REPO_PATH
+- Guarde os caminhos em variaveis mentais: DOCS_PATH, DOWNLOADS_PATH, REPO_PATH
+- Informe: "Detectei: [SO], Documentos em [caminho], Downloads em [caminho], Repo em [caminho]"
 
 ## 2. Instalar Node.js (necessario para MCP)
 
@@ -51,12 +55,22 @@ Se `node --version` falhar mas `"/c/Program Files/nodejs/node.exe" --version` fu
 
 IMPORTANTE: Este passo e executado pelo skill automaticamente. O mentorado nao precisa fazer nada.
 
-### 2d. Validar npx
+### 2d. Detectar caminho do Node.js
 
-Rode `npx --version`. Se falhar, tente `"/c/Program Files/nodejs/npx.cmd" --version`.
+Descubra onde o Node.js esta instalado e guarde como NODE_PATH:
+- Rode: `which node` ou `command -v node`
+- Se nao encontrar, tente: `ls "/c/Program Files/nodejs/node.exe"` (Windows)
+- macOS: tente `which node` ou `/usr/local/bin/node`
+
+Guarde o DIRETORIO (sem o executavel) como NODE_PATH.
+Exemplo: se node esta em `/c/Program Files/nodejs/node.exe`, NODE_PATH = `/c/Program Files/nodejs`
+
+### 2e. Validar npx
+
+Rode `npx --version`.
 Se ambos falharem, informe o erro e pare o setup.
 
-Informe: "Node.js [versao] instalado e funcionando."
+Informe: "Node.js [versao] instalado e funcionando. Caminho: [NODE_PATH]"
 
 ## 3. Criar estrutura de pastas em Documentos
 
@@ -152,9 +166,20 @@ Ultima atualizacao: [data de hoje]
 (Nenhuma acao pendente.)
 ```
 
-## 7. Configurar MCPs no Claude Desktop
+## 7. Instalar MCP server do Claude Code
 
-Localize o arquivo de configuracao do Claude Desktop:
+O repositorio inclui um servidor MCP proprio em `mcp-server/`. Instale as dependencias:
+
+```
+cd REPO_PATH/mcp-server && npm install
+```
+
+Aguarde a instalacao completar. Se falhar, tente novamente.
+
+## 8. Configurar MCPs no Claude Desktop
+
+### 8a. Localizar arquivo de configuracao
+
 - Windows (Microsoft Store): procure em AppData/Local/Packages/ por pasta que comece com "Claude_" e dentro dela LocalCache/Roaming/Claude/claude_desktop_config.json
   - Use: find /c/Users/*/AppData/Local/Packages/Claude_*/LocalCache/Roaming/Claude/ -name "claude_desktop_config.json" 2>/dev/null
 - Windows (instalacao classica): ~/AppData/Roaming/Claude/claude_desktop_config.json
@@ -162,44 +187,71 @@ Localize o arquivo de configuracao do Claude Desktop:
 
 Se o arquivo existir, leia o conteudo atual e PRESERVE TUDO que ja existe (preferences, outros mcpServers, etc). Apenas adicione ou atualize os servidores MCP abaixo.
 
-Adicione/atualize a secao mcpServers com DOIS servidores:
+### 8b. Converter caminhos para formato do SO
 
-### MCP 1: filesystem (acesso a arquivos)
-Permite que Claude Desktop/Cowork leia e escreva arquivos nas pastas Documentos e Downloads.
+Todos os caminhos no JSON precisam estar no formato do SO:
+- **Windows**: barras invertidas duplas. Converter DOCS_PATH, DOWNLOADS_PATH, NODE_PATH e REPO_PATH.
+  Exemplo: `/c/Users/leona/OneDrive/Documentos` → `C:\\Users\\leona\\OneDrive\\Documentos`
+  Exemplo: `/c/Program Files/nodejs` → `C:\\Program Files\\nodejs`
+- **macOS**: barras normais, sem conversao necessaria.
 
-### MCP 2: claude-code (ponte para Claude Code)
-Permite que o Cowork invoque o Claude Code como ferramenta, sem o usuario precisar abrir o terminal.
+Guarde os caminhos convertidos como DOCS_WIN, DOWNLOADS_WIN, NODE_WIN, REPO_WIN (ou equivalente Mac).
 
+### 8c. Escrever configuracao com caminhos dinamicos
+
+Adicione/atualize a secao mcpServers com DOIS servidores.
+Use os caminhos detectados — NUNCA use caminhos fixos.
+
+**MCP 1: filesystem** — Claude Desktop le/escreve arquivos:
+- command: `NODE_WIN\\npx.cmd` (Windows) ou `npx` (macOS)
+- args: `["-y", "@modelcontextprotocol/server-filesystem", "DOCS_WIN", "DOWNLOADS_WIN"]`
+
+**MCP 2: claude-code** — Cowork aciona o Claude Code:
+- command: `NODE_WIN\\node.exe` (Windows) ou `node` (macOS)
+- args: `["REPO_WIN\\mcp-server\\index.mjs"]`
+
+Exemplo Windows (substituir pelos valores reais detectados):
 ```json
 {
   "mcpServers": {
     "filesystem": {
-      "command": "npx",
+      "command": "NODE_WIN\\npx.cmd",
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "DOCS_PATH_AQUI",
-        "DOWNLOADS_PATH_AQUI"
+        "DOCS_WIN",
+        "DOWNLOADS_WIN"
       ]
     },
     "claude-code": {
-      "command": "npx",
+      "command": "NODE_WIN\\node.exe",
       "args": [
-        "-y",
-        "claude-code-mcp"
+        "REPO_WIN\\mcp-server\\index.mjs"
       ]
     }
   }
 }
 ```
 
-Substitua DOCS_PATH_AQUI e DOWNLOADS_PATH_AQUI pelos caminhos reais detectados no passo 1.
-- No Windows use barras invertidas duplas (\\)
-- No Mac use barras normais (/)
+Exemplo macOS (substituir pelos valores reais detectados):
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "DOCS_PATH", "DOWNLOADS_PATH"]
+    },
+    "claude-code": {
+      "command": "node",
+      "args": ["REPO_PATH/mcp-server/index.mjs"]
+    }
+  }
+}
+```
 
 IMPORTANTE: Preserve qualquer configuracao existente no arquivo (preferences, localAgentModeTrustedFolders, etc). Apenas adicione/atualize os mcpServers.
 
-## 8. Configurar Cowork trusted folders
+## 9. Configurar Cowork trusted folders
 
 No mesmo arquivo de configuracao do Claude Desktop, verifique se existe a secao preferences.localAgentModeTrustedFolders. Se existir, adicione DOCS_PATH a lista (se nao estiver la). Se nao existir, crie:
 
@@ -215,7 +267,7 @@ No mesmo arquivo de configuracao do Claude Desktop, verifique se existe a secao 
 
 Isso permite que o Cowork trabalhe diretamente na pasta Documentos sem pedir permissao toda vez.
 
-## 9. Configurar permissoes do Claude Code
+## 10. Configurar permissoes do Claude Code
 
 Verifique se existe ~/.claude/settings.json. Se existir, leia e preserve. Adicione/atualize as permissoes para incluir:
 
@@ -236,21 +288,23 @@ Verifique se existe ~/.claude/settings.json. Se existir, leia e preserve. Adicio
 }
 ```
 
-## 10. Validacao final
+## 11. Validacao final
 
 Execute as seguintes verificacoes e marque cada uma:
 - [ ] Node.js instalado (node --version)
+- [ ] Caminho do Node.js detectado (NODE_PATH)
 - [ ] Pasta Documentos encontrada e acessivel
 - [ ] Estrutura de pastas criada (Consultorias, Ventures, Metodos, _Misc)
 - [ ] CLAUDE.md existe na raiz de Documentos
 - [ ] Templates copiados para _templates/ (4 arquivos)
 - [ ] Indices criados em _overview/ (2 arquivos)
-- [ ] MCP filesystem configurado no Claude Desktop
-- [ ] MCP claude-code configurado no Claude Desktop
+- [ ] MCP server instalado (npm install em mcp-server/)
+- [ ] MCP filesystem configurado no Claude Desktop (com caminhos dinamicos)
+- [ ] MCP claude-code configurado no Claude Desktop (com caminhos dinamicos)
 - [ ] Trusted folders configurado para Cowork
 - [ ] Permissoes do Claude Code configuradas
 
-## 11. Mostrar resumo
+## 12. Mostrar resumo
 
 Apresente um resumo claro do que foi feito:
 
