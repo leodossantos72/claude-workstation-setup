@@ -633,8 +633,30 @@ Execute as seguintes verificacoes e marque cada uma:
 - [ ] MCP claude-code configurado no Claude Desktop (com caminhos dinamicos)
 - [ ] Trusted folders configurado para Cowork
 - [ ] Permissoes do Claude Code configuradas
+- [ ] Instrucoes globais do Cowork configuradas (passo manual)
 
-## 13. Mostrar resumo
+## 13. Configurar instrucoes do Cowork
+
+IMPORTANTE: Claude Desktop/Cowork NAO le o CLAUDE.md automaticamente. E necessario configurar as instrucoes globais do Cowork via interface.
+
+Mostre ao usuario o texto abaixo e peca para ele colar em Settings > Cowork > Global instructions (clicar em "Edit" ao lado de "Global instructions"):
+
+```
+Voce tem dois MCPs: filesystem (ler/escrever arquivos) e claude-code (executar codigo, skills, automacoes).
+
+REGRAS:
+1. Quando eu mencionar que baixei, recebi ou tenho um arquivo novo: IMEDIATAMENTE liste minha pasta Downloads via filesystem, encontre o arquivo mais recente, leia e processe. NAO peca para arrastar ou anexar.
+2. Para tarefas simples (ler, listar, mover arquivos): use filesystem.
+3. Para gerar documentos (Word, PDF, Excel, PowerPoint, landing pages, graficos): use claude-code. Ele tem skills especializados.
+4. Salve arquivos gerados na minha pasta Documentos. Se mencionei um cliente, salve em Consultorias/{cliente}/. Se nao, salve em _Gerados/.
+5. Apos gerar um arquivo, leia-o via filesystem e mostre o conteudo quando possivel.
+6. Para graficos, peca ao claude-code para gerar HTML com Chart.js (nao PNG).
+7. Nunca pergunte qual ferramenta usar. Decida automaticamente.
+```
+
+Alem disso, peca ao usuario para selecionar a pasta Documentos como pasta do Cowork (se ainda nao estiver selecionada).
+
+## 14. Mostrar resumo
 
 Apresente um resumo claro do que foi feito:
 
@@ -658,6 +680,7 @@ O que foi configurado:
   - Roteamento automatico (skills-first)
   - Trusted folders (Cowork trabalha sem pedir permissao)
   - Permissoes do Claude Code (executa sem interrupcoes)
+  - Instrucoes globais do Cowork (comportamento proativo)
 
 =============================================
   PROXIMO PASSO
