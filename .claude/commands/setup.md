@@ -193,9 +193,24 @@ Ao usar claude-code, SEMPRE inclua no prompt:
 - Destino especifico do arquivo
 - "Gere visualizacoes como HTML auto-contido com Chart.js embutido"
 
+## Comportamento proativo
+
+Quando o usuario mencionar que baixou, recebeu ou tem um arquivo novo:
+1. IMEDIATAMENTE liste a pasta Downloads via filesystem MCP
+2. Identifique os arquivos mais recentes
+3. Leia o conteudo sem pedir confirmacao
+4. Identifique o contexto (cliente, venture, ou generico)
+5. Processe: gere resumo, extraia informacoes
+6. Salve o resumo na pasta correta (Consultorias/{cliente}/knowledge/)
+7. Mova o original para {cliente}/processed/
+8. Informe o que fez e pergunte se quer algo mais
+
+NAO peca para o usuario arrastar ou anexar. VA BUSCAR na pasta Downloads.
+
+Gatilhos: "baixei", "fiz download", "recebi um arquivo", "tem um documento novo", "peguei um PDF", "salvei um arquivo"
+
 ## Regras para o Claude
 
-- Ao processar arquivos de Downloads, identificar o contexto e direcionar para a pasta correta
 - Sempre usar os templates de `_templates/` ao gerar documentos de knowledge
 - Atualizar os indices em `_overview/` apos qualquer processamento
 - Nunca misturar arquivos entre projetos
