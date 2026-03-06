@@ -105,7 +105,9 @@ Este e o workspace principal de documentos de trabalho assistido por IA.
 - `Metodos/` - frameworks e metodologias
 - `_Misc/` - documentos diversos
 
-## Roteamento automatico de ferramentas
+## Roteamento automatico (skills-first)
+
+REGRA PRINCIPAL: Antes de executar qualquer tarefa, verifique se existe um skill instalado que faz isso. Se existir, use claude-code para executar (os skills estao em ~/.claude/skills/). Se nao existir skill, decida entre filesystem e claude-code conforme a tabela abaixo.
 
 Voce tem dois MCPs disponiveis. Use o correto automaticamente:
 
@@ -113,15 +115,25 @@ Voce tem dois MCPs disponiveis. Use o correto automaticamente:
 |--------|-----------|
 | Ler/escrever arquivos simples | filesystem |
 | Listar pastas, mover arquivos | filesystem |
-| Criar resumos, gerar documentos | filesystem |
-| Executar codigo (Python, shell) | claude-code (tool: task) |
-| Criar ou rodar skills/commands | claude-code (tool: task) |
-| Instalar pacotes, configurar ferramentas | claude-code (tool: task) |
-| Git (commit, push, pull) | claude-code (tool: task) |
-| Processar lotes de arquivos com logica complexa | claude-code (tool: task) |
-| Criar automacoes ou workflows | claude-code (tool: task) |
+| Criar resumos de texto | filesystem |
+| Criar documentos Word (.docx) | claude-code (skill: docx) |
+| Criar apresentacoes PowerPoint | claude-code (skill: pptx) |
+| Criar/editar PDFs | claude-code (skill: pdf) |
+| Criar/analisar planilhas Excel | claude-code (skill: xlsx) |
+| Criar landing pages / sites | claude-code (skill: web-artifacts-builder) |
+| Criar design visual / imagens | claude-code (skill: canvas-design) |
+| Aplicar identidade visual da marca | claude-code (skill: brand-guidelines) |
+| Escrever comunicados/newsletters | claude-code (skill: internal-comms) |
+| Criar apresentacoes HTML animadas | claude-code (skill: frontend-slides) |
+| Executar codigo (Python, shell) | claude-code |
+| Git (commit, push, pull) | claude-code |
+| Instalar pacotes, configurar ferramentas | claude-code |
+| Criar automacoes ou workflows | claude-code |
+| Criar novos skills | claude-code (skill: skill-creator) |
 
-IMPORTANTE: Nunca pergunte ao usuario qual ferramenta usar. Decida automaticamente com base na tarefa. Se a tarefa precisa de terminal, codigo ou automacao, use claude-code. Se e leitura/escrita simples de arquivos, use filesystem.
+Skills instalados: docx, pdf, pptx, xlsx, canvas-design, frontend-design, web-artifacts-builder, brand-guidelines, internal-comms, doc-coauthoring, skill-creator, frontend-slides.
+
+IMPORTANTE: Nunca pergunte ao usuario qual ferramenta usar. Decida automaticamente. Se a tarefa envolve gerar arquivos (Word, PDF, Excel, PowerPoint, HTML, imagens), SEMPRE use claude-code — ele tem skills especializados pra isso.
 
 ## Regras para o Claude
 
@@ -194,9 +206,84 @@ cd REPO_PATH/mcp-server && npm install
 
 Aguarde a instalacao completar. Se falhar, tente novamente.
 
-## 8. Configurar MCPs no Claude Desktop
+## 8. Instalar skills oficiais
 
-### 8a. Localizar arquivo de configuracao
+Skills sao arquivos .md que ensinam o Claude Code a executar tarefas especializadas (criar PDFs, PowerPoints, landing pages, etc). Sao auto-descobertos em ~/.claude/skills/.
+
+### 8a. Clonar repositorio oficial da Anthropic
+
+```
+cd /tmp && git clone --depth 1 https://github.com/anthropics/skills.git anthropic-skills 2>/dev/null || true
+```
+
+### 9b. Copiar skills relevantes para ~/.claude/skills/
+
+Crie o diretorio ~/.claude/skills/ se nao existir. Copie APENAS estas pastas do repo clonado (skills/):
+
+- docx
+- pdf
+- pptx
+- xlsx
+- canvas-design
+- frontend-design
+- web-artifacts-builder
+- brand-guidelines
+- internal-comms
+- doc-coauthoring
+- skill-creator
+
+Cada pasta contem um SKILL.md. Copie a pasta inteira mantendo a estrutura.
+
+```
+mkdir -p ~/.claude/skills
+cp -r /tmp/anthropic-skills/skills/docx ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/pdf ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/pptx ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/xlsx ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/canvas-design ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/frontend-design ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/web-artifacts-builder ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/brand-guidelines ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/internal-comms ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/doc-coauthoring ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/skill-creator ~/.claude/skills/ 2>/dev/null || true
+```
+
+### 9c. Instalar skill de apresentacoes HTML (comunidade)
+
+```
+mkdir -p ~/.claude/skills/frontend-slides
+```
+
+Crie o arquivo ~/.claude/skills/frontend-slides/SKILL.md com este conteudo:
+
+```
+---
+name: frontend-slides
+description: Cria apresentacoes HTML animadas e responsivas usando HTML, CSS e JavaScript
+autoContext: false
+---
+
+Ao criar apresentacoes:
+1. Use HTML5 + CSS3 + JavaScript puro
+2. Crie slides como secoes com transicoes suaves
+3. Inclua navegacao por setas do teclado e clique
+4. Use design moderno com gradientes, sombras e tipografia limpa
+5. Gere um unico arquivo .html auto-contido
+6. Adapte para tela cheia (apresentacao) e responsivo (mobile)
+```
+
+### 8d. Limpar repo temporario
+
+```
+rm -rf /tmp/anthropic-skills
+```
+
+Informe quantos skills foram instalados. Exemplo: "11 skills oficiais + 1 da comunidade instalados em ~/.claude/skills/"
+
+## 9. Configurar MCPs no Claude Desktop
+
+### 9a. Localizar arquivo de configuracao
 
 - Windows (Microsoft Store): procure em AppData/Local/Packages/ por pasta que comece com "Claude_" e dentro dela LocalCache/Roaming/Claude/claude_desktop_config.json
   - Use: find /c/Users/*/AppData/Local/Packages/Claude_*/LocalCache/Roaming/Claude/ -name "claude_desktop_config.json" 2>/dev/null
@@ -205,7 +292,7 @@ Aguarde a instalacao completar. Se falhar, tente novamente.
 
 Se o arquivo existir, leia o conteudo atual e PRESERVE TUDO que ja existe (preferences, outros mcpServers, etc). Apenas adicione ou atualize os servidores MCP abaixo.
 
-### 8b. Converter caminhos para formato do SO
+### 9b. Converter caminhos para formato do SO
 
 Todos os caminhos no JSON precisam estar no formato do SO:
 - **Windows**: barras invertidas duplas. Converter DOCS_PATH, DOWNLOADS_PATH, NODE_PATH e REPO_PATH.
@@ -215,7 +302,7 @@ Todos os caminhos no JSON precisam estar no formato do SO:
 
 Guarde os caminhos convertidos como DOCS_WIN, DOWNLOADS_WIN, NODE_WIN, REPO_WIN (ou equivalente Mac).
 
-### 8c. Escrever configuracao com caminhos dinamicos
+### 9c. Escrever configuracao com caminhos dinamicos
 
 Adicione/atualize a secao mcpServers com DOIS servidores.
 Use os caminhos detectados — NUNCA use caminhos fixos.
@@ -269,7 +356,7 @@ Exemplo macOS (substituir pelos valores reais detectados):
 
 IMPORTANTE: Preserve qualquer configuracao existente no arquivo (preferences, localAgentModeTrustedFolders, etc). Apenas adicione/atualize os mcpServers.
 
-## 9. Configurar Cowork trusted folders
+## 10. Configurar Cowork trusted folders
 
 No mesmo arquivo de configuracao do Claude Desktop, verifique se existe a secao preferences.localAgentModeTrustedFolders. Se existir, adicione DOCS_PATH a lista (se nao estiver la). Se nao existir, crie:
 
@@ -285,7 +372,7 @@ No mesmo arquivo de configuracao do Claude Desktop, verifique se existe a secao 
 
 Isso permite que o Cowork trabalhe diretamente na pasta Documentos sem pedir permissao toda vez.
 
-## 10. Configurar permissoes do Claude Code
+## 11. Configurar permissoes do Claude Code
 
 Verifique se existe ~/.claude/settings.json. Se existir, leia e preserve. Adicione/atualize as permissoes para incluir:
 
@@ -306,7 +393,7 @@ Verifique se existe ~/.claude/settings.json. Se existir, leia e preserve. Adicio
 }
 ```
 
-## 11. Validacao final
+## 12. Validacao final
 
 Execute as seguintes verificacoes e marque cada uma:
 - [ ] Node.js instalado (node --version)
@@ -317,12 +404,13 @@ Execute as seguintes verificacoes e marque cada uma:
 - [ ] Templates copiados para _templates/ (4 arquivos)
 - [ ] Indices criados em _overview/ (2 arquivos)
 - [ ] MCP server instalado (npm install em mcp-server/)
+- [ ] Skills instalados em ~/.claude/skills/ (12 skills)
 - [ ] MCP filesystem configurado no Claude Desktop (com caminhos dinamicos)
 - [ ] MCP claude-code configurado no Claude Desktop (com caminhos dinamicos)
 - [ ] Trusted folders configurado para Cowork
 - [ ] Permissoes do Claude Code configuradas
 
-## 12. Mostrar resumo
+## 13. Mostrar resumo
 
 Apresente um resumo claro do que foi feito:
 
@@ -339,8 +427,11 @@ O que foi configurado:
   - Estrutura de pastas do segundo cerebro
   - CLAUDE.md (contexto permanente para a IA)
   - Templates padrao (contrato, reuniao, decisao, perfil)
+  - 12 skills prontos (Word, PDF, Excel, PowerPoint,
+    landing pages, design, apresentacoes HTML, e mais)
   - MCP filesystem (Claude Desktop le/escreve seus arquivos)
   - MCP claude-code (Cowork pode acionar o Claude Code)
+  - Roteamento automatico (skills-first)
   - Trusted folders (Cowork trabalha sem pedir permissao)
   - Permissoes do Claude Code (executa sem interrupcoes)
 
@@ -354,17 +445,27 @@ O que foi configurado:
    "liste os arquivos da minha pasta Documentos"
    Se listar, esta tudo funcionando!
 
-3. Para processar documentos, diga no Claude Desktop:
-   "processe os arquivos novos que estao em Downloads,
-    gere resumos estruturados e organize na pasta correta"
+3. Experimente pedir (tudo pelo Claude Desktop):
+   - "cria uma apresentacao sobre [tema]"
+   - "faz uma landing page pro meu produto"
+   - "analisa essa planilha" (arraste o arquivo)
+   - "cria uma proposta comercial em PDF"
+   - "gera 5 variacoes de copy pra um anuncio"
+   - "cria um roteiro de video de 60 segundos"
 
-4. Para consultar, pergunte no Claude Desktop:
-   "o que temos documentado ate agora?"
+4. Para processar documentos:
+   "processe os arquivos novos de Downloads"
 
 DICA: Use o Cowork para tarefas mais longas.
       Ele trabalha em background enquanto voce faz outras coisas.
 
 Voce NAO precisa abrir o terminal no dia a dia.
 Tudo e feito pelo Claude Desktop / Cowork.
+
+Skills instalados (o Claude usa automaticamente):
+  docx, pdf, pptx, xlsx, canvas-design,
+  frontend-design, web-artifacts-builder,
+  brand-guidelines, internal-comms,
+  doc-coauthoring, skill-creator, frontend-slides
 =============================================
 ```
