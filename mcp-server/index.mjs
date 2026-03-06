@@ -26,7 +26,14 @@ server.registerTool("task", {
 - Any task that goes beyond simple file read/write
 
 DO NOT use this tool for simple file reading/writing — use the filesystem MCP for that.
-Always pass absolute Windows paths for cwd (e.g. C:\\\\Users\\\\...).`,
+Always pass absolute Windows paths for cwd (e.g. C:\\\\Users\\\\...).
+
+IMPORTANT: When generating files (documents, charts, presentations), include in the task:
+- The absolute output path where the file should be saved
+- For charts/visualizations: "generate as self-contained HTML with Chart.js embedded"
+- The result text should include the full path of any generated files
+
+After this tool returns, use the filesystem MCP to read and display generated files to the user.`,
   inputSchema: {
     task: z.string().describe("The task to delegate, keep it close to original user query"),
     cwd: z.string().optional().describe("Working directory (absolute Windows path). Defaults to user home directory."),

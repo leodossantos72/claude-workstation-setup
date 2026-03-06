@@ -179,9 +179,19 @@ Subpastas por tipo:
 - Marketing (copies, calendarios) → {destino}/marketing/
 - Imagens/Design → {destino}/design/
 
-APOS gerar: informe o caminho completo, mostre conteudo inline se HTML, pergunte se quer ajustes.
+APOS o claude-code retornar, SEMPRE:
+1. Leia o arquivo gerado via filesystem MCP
+2. HTML → mostre inline ao usuario
+3. Imagem → leia e mostre ao usuario
+4. DOCX/PPTX/XLSX/PDF → informe caminho: "Abra o arquivo para visualizar"
+5. Pergunte se quer ajustes
 
-Ao usar claude-code, SEMPRE inclua no prompt o caminho absoluto de DOCS_PATH e o destino do arquivo.
+Para graficos: SEMPRE peca HTML auto-contido (Chart.js/SVG), NAO PNG.
+
+Ao usar claude-code, SEMPRE inclua no prompt:
+- Caminho absoluto de DOCS_PATH como cwd
+- Destino especifico do arquivo
+- "Gere visualizacoes como HTML auto-contido com Chart.js embutido"
 
 ## Regras para o Claude
 
