@@ -125,13 +125,24 @@ Voce tem dois MCPs disponiveis. Use o correto automaticamente:
 | Aplicar identidade visual da marca | claude-code (skill: brand-guidelines) |
 | Escrever comunicados/newsletters | claude-code (skill: internal-comms) |
 | Criar apresentacoes HTML animadas | claude-code (skill: frontend-slides) |
+| Gerar copies de anuncio | claude-code (skill: ad-copy) |
+| Criar roteiros de video/reels | claude-code (skill: video-script) |
+| Montar calendario de conteudo | claude-code (skill: content-calendar) |
+| Criar proposta comercial | claude-code (skill: commercial-proposal) |
+| Criar sequencia de emails | claude-code (skill: email-sequence) |
+| Analisar concorrentes | claude-code (skill: competitor-analysis) |
+| Criar posts para redes sociais | claude-code (skill: social-media-post) |
+| Criar conteudo SEO | claude-code (skill: seo-content) |
+| Criar landing page | claude-code (skill: landing-page) |
+| Gerar relatorios | claude-code (skill: report-generator) |
+| Auditar campanhas de anuncios | claude-code (skill: claude-ads) |
 | Executar codigo (Python, shell) | claude-code |
 | Git (commit, push, pull) | claude-code |
 | Instalar pacotes, configurar ferramentas | claude-code |
 | Criar automacoes ou workflows | claude-code |
 | Criar novos skills | claude-code (skill: skill-creator) |
 
-Skills instalados: docx, pdf, pptx, xlsx, canvas-design, frontend-design, web-artifacts-builder, brand-guidelines, internal-comms, doc-coauthoring, skill-creator, frontend-slides.
+Skills instalados (~30): docx, pdf, pptx, xlsx, canvas-design, frontend-design, web-artifacts-builder, brand-guidelines, internal-comms, doc-coauthoring, skill-creator, algorithmic-art, theme-factory, slack-gif-creator, claude-ads (auditoria de anuncios), ad-copy, video-script, content-calendar, commercial-proposal, email-sequence, competitor-analysis, social-media-post, seo-content, landing-page, report-generator, frontend-slides.
 
 IMPORTANTE: Nunca pergunte ao usuario qual ferramenta usar. Decida automaticamente. Se a tarefa envolve gerar arquivos (Word, PDF, Excel, PowerPoint, HTML, imagens), SEMPRE use claude-code — ele tem skills especializados pra isso.
 
@@ -216,70 +227,221 @@ Skills sao arquivos .md que ensinam o Claude Code a executar tarefas especializa
 cd /tmp && git clone --depth 1 https://github.com/anthropics/skills.git anthropic-skills 2>/dev/null || true
 ```
 
-### 9b. Copiar skills relevantes para ~/.claude/skills/
-
-Crie o diretorio ~/.claude/skills/ se nao existir. Copie APENAS estas pastas do repo clonado (skills/):
-
-- docx
-- pdf
-- pptx
-- xlsx
-- canvas-design
-- frontend-design
-- web-artifacts-builder
-- brand-guidelines
-- internal-comms
-- doc-coauthoring
-- skill-creator
-
-Cada pasta contem um SKILL.md. Copie a pasta inteira mantendo a estrutura.
+### 8b. Copiar todos os skills oficiais
 
 ```
 mkdir -p ~/.claude/skills
-cp -r /tmp/anthropic-skills/skills/docx ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/pdf ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/pptx ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/xlsx ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/canvas-design ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/frontend-design ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/web-artifacts-builder ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/brand-guidelines ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/internal-comms ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/doc-coauthoring ~/.claude/skills/ 2>/dev/null || true
-cp -r /tmp/anthropic-skills/skills/skill-creator ~/.claude/skills/ 2>/dev/null || true
+cp -r /tmp/anthropic-skills/skills/* ~/.claude/skills/
 ```
 
-### 9c. Instalar skill de apresentacoes HTML (comunidade)
+Isso instala os 17 skills oficiais da Anthropic.
+
+### 8c. Instalar claude-ads (auditoria de anuncios)
+
+```
+cd /tmp && git clone --depth 1 https://github.com/AgriciDaniel/claude-ads.git 2>/dev/null || true
+cp -r /tmp/claude-ads/skills/* ~/.claude/skills/ 2>/dev/null || true
+mkdir -p ~/.claude/agents
+cp -r /tmp/claude-ads/agents/* ~/.claude/agents/ 2>/dev/null || true
+```
+
+### 8d. Criar skills de marketing e negocios
+
+Crie cada pasta e SKILL.md abaixo em ~/.claude/skills/:
+
+**ad-copy/SKILL.md:**
+```
+---
+name: ad-copy
+description: Gera variacoes de copy para anuncios (Meta Ads, Google Ads, LinkedIn Ads)
+autoContext: false
+---
+Ao criar copies de anuncio:
+1. Pergunte: produto/servico, publico-alvo, objetivo (vendas, leads, awareness), plataforma
+2. Gere pelo menos 5 variacoes com abordagens diferentes (dor, beneficio, prova social, urgencia, curiosidade)
+3. Para cada variacao inclua: titulo (max 40 chars), texto principal (max 125 chars para Meta), descricao, CTA
+4. Respeite os limites de caracteres de cada plataforma
+5. Sugira emojis quando apropriado para Meta/Instagram
+6. Ao final, recomende as 2 melhores para teste A/B e explique por que
+```
+
+**video-script/SKILL.md:**
+```
+---
+name: video-script
+description: Cria roteiros de video para Reels, TikTok, YouTube e videos institucionais
+autoContext: false
+---
+Ao criar roteiros:
+1. Pergunte: formato (reels 30-60s, YouTube, institucional), objetivo, tom de voz
+2. Estruture com: HOOK (primeiros 3 segundos), DESENVOLVIMENTO, CTA
+3. Inclua colunas: TEMPO | VISUAL | AUDIO | TEXTO NA TELA
+4. Para Reels/TikTok: hooks que prendem nos primeiros 3 segundos, max 60 segundos
+5. Para YouTube: intro, capitulos, CTA no meio e no final
+6. Sugira trilha sonora e efeitos visuais
+7. Marque momentos de corte e transicao
+```
+
+**content-calendar/SKILL.md:**
+```
+---
+name: content-calendar
+description: Cria calendario editorial para redes sociais e conteudo
+autoContext: false
+---
+Ao criar calendarios:
+1. Pergunte: plataformas, frequencia, temas principais, periodo
+2. Gere arquivo Excel (.xlsx) com: Data, Dia, Plataforma, Formato, Tema, Copy, Hashtags, Status
+3. Distribua pilares de conteudo uniformemente
+4. Inclua datas comemorativas relevantes do periodo
+5. Varie formatos: carrossel, reels, stories, post estatico, video
+6. Sugira horarios de publicacao por plataforma
+```
+
+**commercial-proposal/SKILL.md:**
+```
+---
+name: commercial-proposal
+description: Cria propostas comerciais profissionais em PDF
+autoContext: false
+---
+Ao criar propostas:
+1. Pergunte: empresa, cliente, servico/produto, valores, prazo, diferenciais
+2. Estruture: Capa, Sobre Nos, Diagnostico, Solucao Proposta, Escopo, Cronograma, Investimento, Termos, Proximo Passo
+3. Use o skill pdf para gerar o documento final
+4. Inclua tabela de precos com opcoes quando aplicavel
+5. Destaque ROI e beneficios, nao features
+6. Termine com CTA claro e dados de contato
+```
+
+**email-sequence/SKILL.md:**
+```
+---
+name: email-sequence
+description: Cria sequencias de email marketing para lancamentos, nurturing e vendas
+autoContext: false
+---
+Ao criar sequencias:
+1. Pergunte: objetivo (lancamento, nurturing, vendas, onboarding), produto, publico
+2. Crie 5-7 emails com intervalo sugerido entre cada
+3. Para cada email: Assunto (max 50 chars), Preview text, Corpo, CTA
+4. Lancamento: Antecipacao > Valor > Oferta > Prova social > Urgencia > Ultimo dia
+5. Nurturing: Boas-vindas > Problema > Solucao > Case > Conteudo > Oferta soft
+6. Use copywriting (PAS, AIDA) e storytelling
+```
+
+**competitor-analysis/SKILL.md:**
+```
+---
+name: competitor-analysis
+description: Analisa concorrentes e gera relatorio comparativo
+autoContext: false
+---
+Ao analisar concorrentes:
+1. Pergunte: empresa do usuario, 3-5 concorrentes, criterios importantes
+2. Estruture: Posicionamento, Precos, Canais, Mensagem, Pontos Fortes, Pontos Fracos
+3. Crie matriz comparativa em tabela
+4. Identifique gaps e oportunidades
+5. Gere relatorio em PDF ou Excel
+6. Inclua recomendacoes acionaveis com prioridade
+```
+
+**social-media-post/SKILL.md:**
+```
+---
+name: social-media-post
+description: Cria posts otimizados para Instagram, LinkedIn, Twitter/X e Facebook
+autoContext: false
+---
+Ao criar posts:
+1. Pergunte: plataforma, objetivo, tema, tom de voz
+2. Adapte para cada plataforma:
+   - Instagram: visual-first, hashtags (20-30), emojis, carrossel ou single
+   - LinkedIn: profissional, storytelling, 3-5 hashtags
+   - Twitter/X: conciso (280 chars), thread se necessario
+   - Facebook: conversacional, perguntas, compartilhavel
+3. Inclua: texto, sugestao de imagem, hashtags, melhor horario
+4. Para carrosseis: roteiro de cada slide (capa, slides, CTA final)
+5. Gere 3 variacoes para teste
+```
+
+**seo-content/SKILL.md:**
+```
+---
+name: seo-content
+description: Cria conteudo otimizado para SEO (artigos, blog posts, paginas)
+autoContext: false
+---
+Ao criar conteudo SEO:
+1. Pergunte: palavra-chave principal, secundarias, publico, objetivo
+2. Inclua: Title tag (max 60 chars), Meta description (max 155 chars), H1, H2s, H3s
+3. Palavra-chave no titulo, primeiro paragrafo, e distribuida naturalmente
+4. Paragrafos curtos (2-3 frases), listas e bullet points
+5. Minimo 1500 palavras para artigos, 800 para paginas
+6. Sugira alt text para imagens
+```
+
+**landing-page/SKILL.md:**
+```
+---
+name: landing-page
+description: Cria landing pages completas otimizadas para conversao
+autoContext: false
+---
+Ao criar landing pages:
+1. Pergunte: produto/servico, publico-alvo, objetivo, tom
+2. Use web-artifacts-builder para gerar HTML + Tailwind CSS
+3. Secoes: Hero (headline + CTA acima da dobra), Problema, Solucao, Beneficios (3-4 com icones), Prova social, Como funciona (3 passos), FAQ (4-6), CTA final
+4. Design responsivo mobile-first
+5. Micro-interacoes (hover, scroll animations CSS)
+6. Arquivo .html auto-contido e funcional
+```
+
+**report-generator/SKILL.md:**
+```
+---
+name: report-generator
+description: Gera relatorios profissionais a partir de dados, notas ou reunioes
+autoContext: false
+---
+Ao gerar relatorios:
+1. Pergunte: tipo (mensal, trimestral, projeto, reuniao), dados, publico
+2. Estruture: Resumo Executivo, Contexto, Dados/Analise, Insights, Recomendacoes, Proximos Passos
+3. Use graficos e tabelas quando houver dados numericos
+4. Gere em PDF ou Word conforme preferencia
+5. Resumo executivo em 1 pagina
+6. Use bullet points e destaque numeros importantes
+```
+
+### 8e. Criar skill de apresentacoes HTML
 
 ```
 mkdir -p ~/.claude/skills/frontend-slides
 ```
 
-Crie o arquivo ~/.claude/skills/frontend-slides/SKILL.md com este conteudo:
-
+Crie ~/.claude/skills/frontend-slides/SKILL.md:
 ```
 ---
 name: frontend-slides
-description: Cria apresentacoes HTML animadas e responsivas usando HTML, CSS e JavaScript
+description: Cria apresentacoes HTML animadas e responsivas
 autoContext: false
 ---
-
 Ao criar apresentacoes:
 1. Use HTML5 + CSS3 + JavaScript puro
-2. Crie slides como secoes com transicoes suaves
-3. Inclua navegacao por setas do teclado e clique
-4. Use design moderno com gradientes, sombras e tipografia limpa
-5. Gere um unico arquivo .html auto-contido
-6. Adapte para tela cheia (apresentacao) e responsivo (mobile)
+2. Slides como secoes com transicoes suaves
+3. Navegacao por setas do teclado e clique
+4. Design moderno com gradientes, sombras e tipografia limpa
+5. Arquivo .html unico auto-contido
+6. Responsivo (tela cheia e mobile)
 ```
 
-### 8d. Limpar repo temporario
+### 8f. Limpar repos temporarios
 
 ```
-rm -rf /tmp/anthropic-skills
+rm -rf /tmp/anthropic-skills /tmp/claude-ads
 ```
 
-Informe quantos skills foram instalados. Exemplo: "11 skills oficiais + 1 da comunidade instalados em ~/.claude/skills/"
+Conte quantos skills foram instalados em ~/.claude/skills/ e informe o total.
 
 ## 9. Configurar MCPs no Claude Desktop
 
@@ -404,7 +566,7 @@ Execute as seguintes verificacoes e marque cada uma:
 - [ ] Templates copiados para _templates/ (4 arquivos)
 - [ ] Indices criados em _overview/ (2 arquivos)
 - [ ] MCP server instalado (npm install em mcp-server/)
-- [ ] Skills instalados em ~/.claude/skills/ (12 skills)
+- [ ] Skills instalados em ~/.claude/skills/ (~30 skills)
 - [ ] MCP filesystem configurado no Claude Desktop (com caminhos dinamicos)
 - [ ] MCP claude-code configurado no Claude Desktop (com caminhos dinamicos)
 - [ ] Trusted folders configurado para Cowork
@@ -427,8 +589,8 @@ O que foi configurado:
   - Estrutura de pastas do segundo cerebro
   - CLAUDE.md (contexto permanente para a IA)
   - Templates padrao (contrato, reuniao, decisao, perfil)
-  - 12 skills prontos (Word, PDF, Excel, PowerPoint,
-    landing pages, design, apresentacoes HTML, e mais)
+  - ~30 skills prontos (documentos, design, landing pages,
+    ads, roteiros, email marketing, SEO, social media, e mais)
   - MCP filesystem (Claude Desktop le/escreve seus arquivos)
   - MCP claude-code (Cowork pode acionar o Claude Code)
   - Roteamento automatico (skills-first)
@@ -462,10 +624,16 @@ DICA: Use o Cowork para tarefas mais longas.
 Voce NAO precisa abrir o terminal no dia a dia.
 Tudo e feito pelo Claude Desktop / Cowork.
 
-Skills instalados (o Claude usa automaticamente):
-  docx, pdf, pptx, xlsx, canvas-design,
-  frontend-design, web-artifacts-builder,
-  brand-guidelines, internal-comms,
-  doc-coauthoring, skill-creator, frontend-slides
+Skills instalados (~30, o Claude usa automaticamente):
+
+  Documentos: docx, pdf, pptx, xlsx
+  Design: canvas-design, frontend-design, brand-guidelines, theme-factory
+  Web: web-artifacts-builder, landing-page, frontend-slides
+  Marketing: ad-copy, social-media-post, seo-content, content-calendar
+  Video: video-script
+  Comunicacao: internal-comms, email-sequence, doc-coauthoring
+  Negocios: commercial-proposal, report-generator, competitor-analysis
+  Ads: claude-ads + 12 sub-skills (Meta, Google, YouTube, etc.)
+  Meta: skill-creator (cria novos skills sob demanda)
 =============================================
 ```
