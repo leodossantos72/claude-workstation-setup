@@ -16,11 +16,15 @@ Ao final de cada passo, informe o que foi feito. Se algo falhar, informe o erro 
 ## 2. Instalar Node.js (necessario para MCP)
 
 - Verifique se Node.js ja esta instalado: node --version
-- Se NAO estiver instalado:
+- Se o comando falhar, pode ser problema de PATH. No Windows, tente tambem:
+  - "/c/Program Files/nodejs/node.exe" --version
+  - cmd.exe /c "where node"
+- Se NAO estiver instalado em nenhum local:
   - Windows: rode `winget install OpenJS.NodeJS.LTS`
   - macOS: rode `brew install node` (se brew existir) ou instrua o usuario a baixar de nodejs.org
-- Se ja estiver instalado, pule este passo
-- Verifique: npx --version
+- Se ja estiver instalado mas nao no PATH do bash, adicione ao PATH:
+  - export PATH="$PATH:/c/Program Files/nodejs"
+- Verifique: npx --version (ou "/c/Program Files/nodejs/npx.cmd" --version)
 
 ## 3. Criar estrutura de pastas em Documentos
 
