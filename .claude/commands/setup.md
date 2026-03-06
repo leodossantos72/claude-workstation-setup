@@ -15,16 +15,48 @@ Ao final de cada passo, informe o que foi feito. Se algo falhar, informe o erro 
 
 ## 2. Instalar Node.js (necessario para MCP)
 
-- Verifique se Node.js ja esta instalado: node --version
-- Se o comando falhar, pode ser problema de PATH. No Windows, tente tambem:
-  - "/c/Program Files/nodejs/node.exe" --version
-  - cmd.exe /c "where node"
-- Se NAO estiver instalado em nenhum local:
-  - Windows: rode `winget install OpenJS.NodeJS.LTS`
-  - macOS: rode `brew install node` (se brew existir) ou instrua o usuario a baixar de nodejs.org
-- Se ja estiver instalado mas nao no PATH do bash, adicione ao PATH:
-  - export PATH="$PATH:/c/Program Files/nodejs"
-- Verifique: npx --version (ou "/c/Program Files/nodejs/npx.cmd" --version)
+Este passo deve ser 100% automatico. O mentorado NAO faz nada manual.
+
+### 2a. Verificar se Node.js ja existe
+
+Rode `node --version`. Se funcionar, pule para 2d.
+
+### 2b. Se `node` nao foi encontrado no PATH (Windows)
+
+No Windows com Git Bash, o Node.js pode estar instalado mas fora do PATH do bash.
+Execute TODOS estes checks automaticamente, sem perguntar nada ao usuario:
+
+1. Tente: `"/c/Program Files/nodejs/node.exe" --version`
+2. Tente: `cmd.exe /c "node --version" 2>/dev/null`
+
+Se QUALQUER um retornar versao, o Node.js ja esta instalado. Va para 2c.
+Se NENHUM retornar versao, instale:
+- Windows: `winget install OpenJS.NodeJS.LTS --accept-source-agreements --accept-package-agreements`
+- macOS: `brew install node` (se brew existir) ou `curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash && source ~/.bashrc && nvm install --lts`
+
+Apos instalar, aguarde 5 segundos e verifique novamente nos mesmos caminhos.
+
+### 2c. Corrigir PATH automaticamente (Windows Git Bash)
+
+Se `node --version` falhar mas `"/c/Program Files/nodejs/node.exe" --version` funcionar:
+
+1. Rode imediatamente: `export PATH="$PATH:/c/Program Files/nodejs"`
+2. Verifique que `node --version` agora funciona
+3. Para persistir em futuras sessoes do Git Bash, adicione ao ~/.bashrc:
+   ```
+   echo '' >> ~/.bashrc
+   echo '# Node.js PATH (adicionado pelo setup Claude Workstation)' >> ~/.bashrc
+   echo 'export PATH="$PATH:/c/Program Files/nodejs"' >> ~/.bashrc
+   ```
+
+IMPORTANTE: Este passo e executado pelo skill automaticamente. O mentorado nao precisa fazer nada.
+
+### 2d. Validar npx
+
+Rode `npx --version`. Se falhar, tente `"/c/Program Files/nodejs/npx.cmd" --version`.
+Se ambos falharem, informe o erro e pare o setup.
+
+Informe: "Node.js [versao] instalado e funcionando."
 
 ## 3. Criar estrutura de pastas em Documentos
 
