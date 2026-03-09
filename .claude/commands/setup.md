@@ -4,7 +4,23 @@ Ao final de cada passo, informe o que foi feito. Se algo falhar, informe o erro 
 IMPORTANTE: Todos os caminhos sao detectados dinamicamente. NUNCA use caminhos hardcoded.
 Guarde tudo em variaveis mentais para reutilizar nos passos seguintes.
 
-## 1. Detectar ambiente
+## Pre-requisitos do mentorado
+
+Antes de rodar este setup, o mentorado precisa ter:
+- Claude Desktop instalado (com Cowork/Agent ativo)
+- Claude Code CLI instalado (`claude --version` funciona)
+- Conta Anthropic com API key configurada
+- Git instalado (`git --version` funciona)
+- Conexao com internet
+
+O setup instala automaticamente:
+- Node.js (se nao tiver)
+- Todas as dependencias npm (chokidar, agent-sdk)
+- Skills, templates, MCPs, watcher, auto-start
+
+## 1. Detectar ambiente e verificar pre-requisitos
+
+### 1a. Detectar SO e caminhos
 
 - Identifique o sistema operacional (Windows ou macOS)
 - Identifique o shell atual (PowerShell, bash, zsh)
@@ -16,6 +32,23 @@ Guarde tudo em variaveis mentais para reutilizar nos passos seguintes.
 - Detecte o diretorio atual do repositorio (onde este skill esta rodando) — este e o REPO_PATH
 - Guarde os caminhos em variaveis mentais: DOCS_PATH, DOWNLOADS_PATH, REPO_PATH
 - Informe: "Detectei: [SO], Documentos em [caminho], Downloads em [caminho], Repo em [caminho]"
+
+### 1b. Verificar pre-requisitos (PARE se falhar)
+
+Execute TODOS estes checks. Se QUALQUER um falhar, informe o mentorado e PARE:
+
+```
+git --version       # deve retornar versao
+claude --version    # Claude Code CLI deve estar instalado
+```
+
+Se `git` nao existir:
+- Windows: `winget install Git.Git --accept-source-agreements --accept-package-agreements`
+- macOS: `xcode-select --install`
+
+Se `claude` nao existir: instrua o mentorado a instalar em https://docs.anthropic.com/en/docs/claude-code
+
+Apos instalar, VERIFIQUE novamente que funciona antes de continuar.
 
 ## 2. Instalar Node.js (necessario para MCP)
 
@@ -72,172 +105,61 @@ Se ambos falharem, informe o erro e pare o setup.
 
 Informe: "Node.js [versao] instalado e funcionando. Caminho: [NODE_PATH]"
 
-## 3. Criar estrutura de pastas em Documentos
+## 3. Escanear e indexar estrutura de Documentos
 
-Dentro de DOCS_PATH, crie (nao sobrescrever pastas que ja existam):
+### 3a. Criar pastas auxiliares
 
-```
-Consultorias/
-  _templates/
-  _overview/
-Ventures/
-Metodos/
-_Misc/
-_Gerados/
-  documentos/
-  apresentacoes/
-  planilhas/
-  web/
-  marketing/
-  design/
-```
-
-A pasta _Gerados/ e o destino padrao para arquivos criados por skills quando nao ha contexto de cliente/projeto especifico.
-
-## 4. Criar CLAUDE.md na raiz de Documentos
-
-Se ja existir um CLAUDE.md, PRESERVE o conteudo existente e apenas adicione o que faltar.
-
-Se nao existir, criar DOCS_PATH/CLAUDE.md com este conteudo:
+Dentro de DOCS_PATH, crie APENAS estas pastas (nao sobrescrever o que ja existe):
 
 ```
-# Workspace
-
-Este e o workspace principal de documentos de trabalho assistido por IA.
-
-## Estrutura
-
-- `Consultorias/` - projetos e clientes
-  - `_templates/` - templates padrao compartilhados
-  - `_overview/` - indices e visao consolidada
-- `Ventures/` - negocios proprios / sociedades
-- `Metodos/` - frameworks e metodologias
-- `_Misc/` - documentos diversos
-- `_Gerados/` - arquivos criados por skills (destino padrao quando sem contexto)
-  - `documentos/` - Word, PDF
-  - `apresentacoes/` - PowerPoint, HTML
-  - `planilhas/` - Excel, CSV
-  - `web/` - landing pages, sites
-  - `marketing/` - copies, calendarios
-  - `design/` - imagens, banners
-
-## Roteamento automatico (skills-first)
-
-REGRA PRINCIPAL: Antes de executar qualquer tarefa, verifique se existe um skill instalado que faz isso. Se existir, use claude-code para executar (os skills estao em ~/.claude/skills/). Se nao existir skill, decida entre filesystem e claude-code conforme a tabela abaixo.
-
-Voce tem dois MCPs disponiveis. Use o correto automaticamente:
-
-| Tarefa | Ferramenta |
-|--------|-----------|
-| Ler/escrever arquivos simples | filesystem |
-| Listar pastas, mover arquivos | filesystem |
-| Criar resumos de texto | filesystem |
-| Criar documentos Word (.docx) | claude-code (skill: docx) |
-| Criar apresentacoes PowerPoint | claude-code (skill: pptx) |
-| Criar/editar PDFs | claude-code (skill: pdf) |
-| Criar/analisar planilhas Excel | claude-code (skill: xlsx) |
-| Criar landing pages / sites | claude-code (skill: web-artifacts-builder) |
-| Criar design visual / imagens | claude-code (skill: canvas-design) |
-| Aplicar identidade visual da marca | claude-code (skill: brand-guidelines) |
-| Escrever comunicados/newsletters | claude-code (skill: internal-comms) |
-| Criar apresentacoes HTML animadas | claude-code (skill: frontend-slides) |
-| Gerar copies de anuncio | claude-code (skill: ad-copy) |
-| Criar roteiros de video/reels | claude-code (skill: video-script) |
-| Montar calendario de conteudo | claude-code (skill: content-calendar) |
-| Criar proposta comercial | claude-code (skill: commercial-proposal) |
-| Criar sequencia de emails | claude-code (skill: email-sequence) |
-| Analisar concorrentes | claude-code (skill: competitor-analysis) |
-| Criar posts para redes sociais | claude-code (skill: social-media-post) |
-| Criar conteudo SEO | claude-code (skill: seo-content) |
-| Criar landing page | claude-code (skill: landing-page) |
-| Gerar relatorios | claude-code (skill: report-generator) |
-| Auditar campanhas de anuncios | claude-code (skill: claude-ads) |
-| Executar codigo (Python, shell) | claude-code |
-| Git (commit, push, pull) | claude-code |
-| Instalar pacotes, configurar ferramentas | claude-code |
-| Criar automacoes ou workflows | claude-code |
-| Criar novos skills | claude-code (skill: skill-creator) |
-
-Skills instalados (~30): docx, pdf, pptx, xlsx, canvas-design, frontend-design, web-artifacts-builder, brand-guidelines, internal-comms, doc-coauthoring, skill-creator, algorithmic-art, theme-factory, slack-gif-creator, claude-ads (auditoria de anuncios), ad-copy, video-script, content-calendar, commercial-proposal, email-sequence, competitor-analysis, social-media-post, seo-content, landing-page, report-generator, frontend-slides.
-
-IMPORTANTE: Nunca pergunte ao usuario qual ferramenta usar. Decida automaticamente. Se a tarefa envolve gerar arquivos (Word, PDF, Excel, PowerPoint, HTML, imagens), SEMPRE use claude-code — ele tem skills especializados pra isso.
-
-## Onde salvar arquivos gerados
-
-Todo arquivo gerado por skills DEVE ser salvo na pasta Documentos (DOCS_PATH).
-
-Logica de destino:
-1. Se o usuario mencionou um cliente/projeto → Consultorias/{cliente}/
-2. Se mencionou uma venture → Ventures/{projeto}/
-3. Se e generico → _Gerados/
-
-Subpastas por tipo:
-- Documentos (docx, pdf) → {destino}/documentos/
-- Apresentacoes (pptx, html) → {destino}/apresentacoes/
-- Planilhas (xlsx, csv) → {destino}/planilhas/
-- Web (landing pages) → {destino}/web/
-- Marketing (copies, calendarios) → {destino}/marketing/
-- Imagens/Design → {destino}/design/
-
-APOS o claude-code retornar, SEMPRE:
-1. Leia o arquivo gerado via filesystem MCP
-2. HTML → mostre inline ao usuario
-3. Imagem → leia e mostre ao usuario
-4. DOCX/PPTX/XLSX/PDF → informe caminho: "Abra o arquivo para visualizar"
-5. Pergunte se quer ajustes
-
-Para graficos: SEMPRE peca HTML auto-contido (Chart.js/SVG), NAO PNG.
-
-Ao usar claude-code, SEMPRE inclua no prompt:
-- Caminho absoluto de DOCS_PATH como cwd
-- Destino especifico do arquivo
-- "Gere visualizacoes como HTML auto-contido com Chart.js embutido"
-
-## Comportamento proativo
-
-Quando o usuario mencionar que baixou, recebeu ou tem um arquivo novo:
-1. IMEDIATAMENTE liste a pasta Downloads via filesystem MCP
-2. Identifique os arquivos mais recentes
-3. Leia o conteudo sem pedir confirmacao
-4. Identifique o contexto (cliente, venture, ou generico)
-5. Processe: gere resumo, extraia informacoes
-6. Salve o resumo na pasta correta (Consultorias/{cliente}/knowledge/)
-7. Mova o original para {cliente}/processed/
-8. Informe o que fez e pergunte se quer algo mais
-
-NAO peca para o usuario arrastar ou anexar. VA BUSCAR na pasta Downloads.
-
-Gatilhos: "baixei", "fiz download", "recebi um arquivo", "tem um documento novo", "peguei um PDF", "salvei um arquivo"
-
-## Regras para o Claude
-
-- Sempre usar os templates de `_templates/` ao gerar documentos de knowledge
-- Atualizar os indices em `_overview/` apos qualquer processamento
-- Nunca misturar arquivos entre projetos
-- Preservar edicoes manuais existentes em arquivos de knowledge
-
-## Fluxo de processamento
-
-Downloads/ (inbox natural) > Identificar contexto > knowledge/ > processed/ > _overview/
-
-## Como processar documentos
-
-No Claude Desktop (Cowork), dizer:
-"processe os arquivos novos de Downloads"
-
-O Claude vai ler os arquivos via MCP filesystem, gerar resumos estruturados em knowledge/, mover originais para processed/ e atualizar os indices.
-
-## Templates disponiveis em _templates/
-
-- contract.md — para contratos
-- meeting.md — para reunioes
-- decision.md — para decisoes
-- client_profile.md — para perfis de clientes
+_knowledge/
+_gerados/
 ```
+
+- `_knowledge/` — memoria da IA: indice da estrutura, contexto de projetos, resumos processados
+- `_gerados/` — destino padrao para arquivos gerados quando nao ha contexto de projeto
+
+### 3b. Gerar indice da estrutura existente
+
+Liste TODAS as pastas e subpastas de DOCS_PATH (ate 2 niveis de profundidade). Gere o arquivo DOCS_PATH/_knowledge/index.md com este formato:
+
+```
+# Indice do Workspace
+
+Ultima atualizacao: [data de hoje]
+
+## Estrutura de pastas
+
+[liste todas as pastas encontradas com uma breve descricao do que parecem conter, baseado nos nomes e arquivos dentro delas]
+
+Exemplo:
+- `Projetos/ClienteX/` — [descricao baseada nos arquivos encontrados]
+- `Financeiro/` — [descricao]
+- `Pessoal/` — [descricao]
+
+## Projetos/contextos identificados
+
+[liste projetos, clientes ou contextos que voce conseguiu identificar pela estrutura]
+
+## Arquivos recentes
+
+[liste os 10 arquivos mais recentes encontrados com caminho e data]
+```
+
+IMPORTANTE: Respeite 100% a estrutura que o usuario ja tem. NAO crie pastas de organizacao (como Consultorias/, Ventures/, etc) — use o que ja existe. O indice serve para o Claude conhecer e navegar a estrutura do usuario, nao para impor uma nova.
+
+## 4. Detectar pasta Desktop
+
+Detecte a pasta Desktop do usuario:
+- Windows com OneDrive: ~/OneDrive/Desktop ou ~/OneDrive/Área de Trabalho
+- Windows local: ~/Desktop ou ~/Área de Trabalho
+- macOS: ~/Desktop
+
+Guarde como DESKTOP_PATH. Esta pasta sera a base de trabalho do Cowork.
 
 ## 5. Copiar templates
 
-Copie os arquivos de templates/ deste repositorio para DOCS_PATH/Consultorias/_templates/
+Copie os arquivos de templates/ deste repositorio para DOCS_PATH/_knowledge/templates/
 
 Os templates sao:
 - contract.md
@@ -247,29 +169,7 @@ Os templates sao:
 
 Nao sobrescrever templates que ja existam.
 
-## 6. Criar indices em _overview/
-
-Criar estes arquivos em DOCS_PATH/Consultorias/_overview/ (se nao existirem):
-
-### clients_index.md
-```
-# Indice de Clientes
-
-Ultima atualizacao: [data de hoje]
-
-(Nenhum cliente cadastrado ainda. Processe documentos para popular este indice.)
-```
-
-### pending_actions.md
-```
-# Acoes Pendentes
-
-Ultima atualizacao: [data de hoje]
-
-(Nenhuma acao pendente.)
-```
-
-## 7. Instalar MCP server do Claude Code
+## 6. Instalar MCP server do Claude Code
 
 O repositorio inclui um servidor MCP proprio em `mcp-server/`. Instale as dependencias:
 
@@ -279,17 +179,17 @@ cd REPO_PATH/mcp-server && npm install
 
 Aguarde a instalacao completar. Se falhar, tente novamente.
 
-## 8. Instalar skills oficiais
+## 7. Instalar skills oficiais
 
 Skills sao arquivos .md que ensinam o Claude Code a executar tarefas especializadas (criar PDFs, PowerPoints, landing pages, etc). Sao auto-descobertos em ~/.claude/skills/.
 
-### 8a. Clonar repositorio oficial da Anthropic
+### 7a. Clonar repositorio oficial da Anthropic
 
 ```
 cd /tmp && git clone --depth 1 https://github.com/anthropics/skills.git anthropic-skills 2>/dev/null || true
 ```
 
-### 8b. Copiar todos os skills oficiais
+### 7b. Copiar todos os skills oficiais
 
 ```
 mkdir -p ~/.claude/skills
@@ -298,7 +198,7 @@ cp -r /tmp/anthropic-skills/skills/* ~/.claude/skills/
 
 Isso instala os 17 skills oficiais da Anthropic.
 
-### 8c. Instalar claude-ads (auditoria de anuncios)
+### 7c. Instalar claude-ads (auditoria de anuncios)
 
 ```
 cd /tmp && git clone --depth 1 https://github.com/AgriciDaniel/claude-ads.git 2>/dev/null || true
@@ -307,7 +207,7 @@ mkdir -p ~/.claude/agents
 cp -r /tmp/claude-ads/agents/* ~/.claude/agents/ 2>/dev/null || true
 ```
 
-### 8d. Criar skills de marketing e negocios
+### 7d. Criar skills de marketing e negocios
 
 Crie cada pasta e SKILL.md abaixo em ~/.claude/skills/:
 
@@ -475,7 +375,7 @@ Ao gerar relatorios:
 6. Use bullet points e destaque numeros importantes
 ```
 
-### 8e. Criar skill de apresentacoes HTML
+### 7e. Criar skill de apresentacoes HTML
 
 ```
 mkdir -p ~/.claude/skills/frontend-slides
@@ -497,7 +397,7 @@ Ao criar apresentacoes:
 6. Responsivo (tela cheia e mobile)
 ```
 
-### 8f. Limpar repos temporarios
+### 7f. Limpar repos temporarios
 
 ```
 rm -rf /tmp/anthropic-skills /tmp/claude-ads
@@ -505,9 +405,9 @@ rm -rf /tmp/anthropic-skills /tmp/claude-ads
 
 Conte quantos skills foram instalados em ~/.claude/skills/ e informe o total.
 
-## 9. Configurar MCPs no Claude Desktop
+## 8. Configurar MCPs no Claude Desktop
 
-### 9a. Localizar arquivo de configuracao
+### 8a. Localizar arquivo de configuracao
 
 - Windows (Microsoft Store): procure em AppData/Local/Packages/ por pasta que comece com "Claude_" e dentro dela LocalCache/Roaming/Claude/claude_desktop_config.json
   - Use: find /c/Users/*/AppData/Local/Packages/Claude_*/LocalCache/Roaming/Claude/ -name "claude_desktop_config.json" 2>/dev/null
@@ -516,7 +416,7 @@ Conte quantos skills foram instalados em ~/.claude/skills/ e informe o total.
 
 Se o arquivo existir, leia o conteudo atual e PRESERVE TUDO que ja existe (preferences, outros mcpServers, etc). Apenas adicione ou atualize os servidores MCP abaixo.
 
-### 9b. Converter caminhos para formato do SO
+### 8b. Converter caminhos para formato do SO
 
 Todos os caminhos no JSON precisam estar no formato do SO:
 - **Windows**: barras invertidas duplas. Converter DOCS_PATH, DOWNLOADS_PATH, NODE_PATH e REPO_PATH.
@@ -526,7 +426,7 @@ Todos os caminhos no JSON precisam estar no formato do SO:
 
 Guarde os caminhos convertidos como DOCS_WIN, DOWNLOADS_WIN, NODE_WIN, REPO_WIN (ou equivalente Mac).
 
-### 9c. Escrever configuracao com caminhos dinamicos
+### 8c. Escrever configuracao com caminhos dinamicos
 
 Adicione/atualize a secao mcpServers com DOIS servidores.
 Use os caminhos detectados — NUNCA use caminhos fixos.
@@ -580,23 +480,24 @@ Exemplo macOS (substituir pelos valores reais detectados):
 
 IMPORTANTE: Preserve qualquer configuracao existente no arquivo (preferences, localAgentModeTrustedFolders, etc). Apenas adicione/atualize os mcpServers.
 
-## 10. Configurar Cowork trusted folders
+## 9. Configurar Cowork trusted folders
 
-No mesmo arquivo de configuracao do Claude Desktop, verifique se existe a secao preferences.localAgentModeTrustedFolders. Se existir, adicione DOCS_PATH a lista (se nao estiver la). Se nao existir, crie:
+No mesmo arquivo de configuracao do Claude Desktop, verifique se existe a secao preferences.localAgentModeTrustedFolders. Se existir, adicione DESKTOP_PATH e DOCS_PATH a lista (se nao estiverem la). Se nao existir, crie (DESKTOP_PATH ja foi detectado no passo 4):
 
 ```json
 {
   "preferences": {
     "localAgentModeTrustedFolders": [
+      "DESKTOP_PATH_AQUI_COM_BARRAS_DO_SO",
       "DOCS_PATH_AQUI_COM_BARRAS_DO_SO"
     ]
   }
 }
 ```
 
-Isso permite que o Cowork trabalhe diretamente na pasta Documentos sem pedir permissao toda vez.
+Isso permite que o Cowork trabalhe nas pastas Desktop e Documentos sem pedir permissao.
 
-## 11. Configurar permissoes do Claude Code
+## 10. Configurar permissoes do Claude Code
 
 Verifique se existe ~/.claude/settings.json. Se existir, leia e preserve. Adicione/atualize as permissoes para incluir:
 
@@ -617,46 +518,294 @@ Verifique se existe ~/.claude/settings.json. Se existir, leia e preserve. Adicio
 }
 ```
 
-## 12. Validacao final
+## 11. Criar CLAUDE.md na pasta Desktop (para Cowork)
+
+O Cowork le o CLAUDE.md da pasta de trabalho selecionada. Este arquivo contem TODAS as instrucoes de comportamento do Cowork: quando usar cada MCP, onde salvar arquivos, comportamento proativo com Downloads, etc.
+
+Crie DESKTOP_PATH/CLAUDE.md (ja detectado no passo 4) com este conteudo:
+
+```
+# Assistente de Trabalho
+
+Voce e o assistente de produtividade do usuario. Trabalha no Claude Desktop (Cowork) com acesso a dois MCPs poderosos.
+
+## Ferramentas disponiveis
+
+Voce tem dois MCPs. Use o correto automaticamente, NUNCA pergunte qual usar:
+
+**filesystem** — ler, escrever, listar, mover arquivos nas pastas Documentos e Downloads
+**claude-code** (tool: task) — executar codigo, rodar skills especializados, gerar documentos complexos
+
+## Quando usar cada um
+
+| Tarefa | Usar |
+|--------|------|
+| Ler/listar/mover arquivos | filesystem |
+| Criar resumos de texto simples | filesystem |
+| Criar Word (.docx), PDF, PowerPoint, Excel | claude-code |
+| Criar landing pages, sites HTML | claude-code |
+| Criar design visual, imagens | claude-code |
+| Gerar copies de anuncio | claude-code |
+| Criar roteiros de video | claude-code |
+| Montar calendario de conteudo | claude-code |
+| Criar propostas comerciais | claude-code |
+| Criar sequencias de email | claude-code |
+| Analisar concorrentes | claude-code |
+| Criar posts para redes sociais | claude-code |
+| Criar conteudo SEO | claude-code |
+| Auditar campanhas de anuncios | claude-code |
+| Gerar relatorios com graficos | claude-code |
+| Executar codigo (Python, shell) | claude-code |
+| Qualquer geracao de arquivo complexo | claude-code |
+
+REGRA: Se a tarefa envolve GERAR arquivos (Word, PDF, Excel, PowerPoint, HTML, imagens, graficos), SEMPRE use claude-code. Ele tem ~30 skills especializados pra isso.
+
+## Knowledge base — como conhecer o workspace do usuario
+
+O arquivo `Documentos/_knowledge/index.md` contem o mapa completo da estrutura de pastas e o contexto de cada projeto/pasta do usuario. SEMPRE consulte este arquivo antes de tomar decisoes sobre onde salvar arquivos ou a qual projeto um documento pertence.
+
+Se o index.md nao existir ou estiver desatualizado, liste a pasta Documentos via filesystem e reconstrua o indice.
+
+## Onde salvar arquivos gerados
+
+Ao usar claude-code para gerar arquivos, SEMPRE passe o destino correto:
+
+1. Consulte `_knowledge/index.md` para entender a estrutura do usuario
+2. Se o usuario mencionou um projeto/cliente/contexto → encontre a pasta correspondente no indice
+3. Se nao ha correspondencia clara → salve em `Documentos/_gerados/`
+4. Se nao tem certeza → PERGUNTE ao usuario onde salvar
+
+Apos salvar, atualize o `_knowledge/index.md` se necessario.
+
+## Apos gerar arquivos
+
+1. Leia o arquivo gerado via filesystem MCP
+2. HTML → mostre o conteudo inline
+3. Imagem → leia e mostre
+4. DOCX/PPTX/XLSX/PDF → informe o caminho: "Abra o arquivo para visualizar"
+5. SEMPRE pergunte se quer ajustes
+
+Para graficos e visualizacoes: peca ao claude-code para gerar como HTML auto-contido com Chart.js (NAO PNG).
+
+Ao chamar claude-code, SEMPRE inclua no prompt:
+- O caminho absoluto da pasta Documentos como cwd
+- O destino especifico do arquivo (caminho completo)
+- "Gere visualizacoes como HTML auto-contido com Chart.js embutido"
+
+## Comportamento proativo com Downloads
+
+NOTA: O Watcher automatico ja monitora Downloads e processa arquivos novos em background. Se o usuario pedir explicitamente para processar um arquivo, siga o fluxo abaixo. Caso contrario, o watcher ja fez o trabalho.
+
+Quando o usuario mencionar que baixou, recebeu ou tem um arquivo novo:
+1. Verifique se o watcher ja processou (consulte `_knowledge/topics/` e `_knowledge/index.md`)
+2. Se ja tem topic → informe ao usuario o que o watcher encontrou
+3. Se ainda nao processou, faca manualmente:
+   a. Liste a pasta Downloads via filesystem MCP
+   b. Leia o CONTEUDO COMPLETO do arquivo
+   c. Identifique o contexto pelo CONTEUDO, NUNCA pelo nome do arquivo
+   d. Consulte `_knowledge/index.md` para encontrar a pasta/projeto correspondente
+   e. Se nao encontrar correspondencia, PERGUNTE ao usuario
+   f. Processe: gere resumo, organize na pasta correta
+
+IMPORTANTE: NUNCA use o nome do arquivo para decidir o projeto/cliente. Sempre leia o conteudo primeiro.
+
+Gatilhos: "baixei", "fiz download", "recebi um arquivo", "tem um documento novo", "peguei um PDF", "salvei um arquivo"
+
+## Persistencia proativa de conhecimento
+
+DURANTE a conversa (nao espere o final), persista informacoes importantes:
+
+1. **Decisoes**: Quando o usuario tomar uma decisao relevante (ex: "vamos usar X", "o cliente quer Y"), IMEDIATAMENTE atualize o topic correspondente em `_knowledge/topics/`
+2. **Novos fatos**: Quando o usuario mencionar um fato novo sobre um projeto/cliente, atualize o knowledge
+3. **Preferencias**: Quando o usuario expressar uma preferencia de trabalho, registre em `_knowledge/topics/preferencias.md`
+
+Use filesystem MCP para escrever diretamente nos topics. NAO acumule para o final da conversa — a sessao pode ser encerrada ou compactada a qualquer momento.
+
+Se um topic nao existir ainda, crie-o. Se existir, atualize (nao sobrescreva — adicione a nova informacao).
+
+## Busca no knowledge
+
+O watcher tem busca full-text sobre os topics. Se precisar encontrar informacao especifica no knowledge, use claude-code para buscar:
+```
+node REPO_PATH/watcher/index.mjs --search "palavra-chave"
+```
+Suporta multiplas palavras (todas devem aparecer no topic).
+
+## Regras gerais
+
+- Nunca pergunte qual ferramenta usar — decida automaticamente
+- Nunca misture arquivos entre projetos
+- Sempre consulte `_knowledge/index.md` antes de decidir onde salvar
+- Atualize o indice apos qualquer processamento ou geracao de arquivo
+- Preserve edicoes manuais em arquivos existentes
+- Responda em portugues brasileiro
+
+## Privacidade
+
+Arquivos processados pelo watcher e pelo Cowork sao enviados via API para a Anthropic. NAO coloque documentos confidenciais, sensiveis ou com dados pessoais de terceiros na estrutura monitorada. Se necessario, crie uma pasta com arquivo `.nowatcher` dentro para excluir do monitoramento automatico.
+```
+
+## 12. Instalar e configurar o Watcher
+
+O watcher monitora as pastas Documentos e Downloads. Quando detecta arquivos novos ou editados, chama o Claude Code via Agent SDK para ler o conteudo, criar knowledge em `_knowledge/topics/`, e organizar arquivos na estrutura existente. Tambem tem busca full-text sobre o knowledge.
+
+### 12a. Instalar dependencias do watcher
+
+```
+cd REPO_PATH/watcher && npm install
+```
+
+### 12b. Configurar auto-start com o sistema
+
+O watcher deve iniciar automaticamente quando o usuario liga o computador.
+
+**Windows:**
+
+Crie um arquivo .vbs (Visual Basic Script) que inicia o watcher sem janela visivel:
+
+1. Crie o arquivo `REPO_PATH/watcher/start-watcher.vbs` com o conteudo:
+```vbs
+Set objShell = CreateObject("WScript.Shell")
+objShell.Run """NODE_WIN\node.exe"" ""REPO_WIN\watcher\index.mjs"" ""DOCS_WIN""", 0, False
+```
+(substitua NODE_WIN, REPO_WIN e DOCS_WIN pelos caminhos Windows detectados)
+
+2. Crie um atalho deste .vbs na pasta Startup do Windows:
+```
+cp "REPO_PATH/watcher/start-watcher.vbs" "$APPDATA/Microsoft/Windows/Start Menu/Programs/Startup/claude-watcher.vbs"
+```
+
+**macOS:**
+
+Crie um LaunchAgent para iniciar automaticamente:
+
+1. Crie o arquivo `~/Library/LaunchAgents/com.claude.watcher.plist` com:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.claude.watcher</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>NODE_PATH/node</string>
+        <string>REPO_PATH/watcher/index.mjs</string>
+        <string>DOCS_PATH</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/claude-watcher.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/claude-watcher.log</string>
+</dict>
+</plist>
+```
+(substitua NODE_PATH, REPO_PATH e DOCS_PATH pelos caminhos reais detectados)
+
+2. Carregue o agente:
+```
+launchctl load ~/Library/LaunchAgents/com.claude.watcher.plist
+```
+
+### 12c. Verificar que o watcher esta rodando
+
+Inicie o watcher manualmente para a sessao atual (o auto-start vai cuidar das proximas vezes):
+
+```
+cd REPO_PATH/watcher && node index.mjs "DOCS_PATH" &
+```
+
+Verifique que o `_knowledge/index.md` foi gerado/atualizado.
+
+## 13. Configurar Cowork Autofix (Windows)
+
+APENAS no Windows. No macOS, pule para o passo 14.
+
+O Cowork no Windows usa uma VM Hyper-V que depende de uma rede virtual (HNS). O Windows perde essa rede com frequencia (apos sleep, updates, mudancas de rede), causando "Request timed out" ao abrir o Cowork. Este passo instala um fix automatico que previne o problema.
+
+O fix funciona assim:
+- Uma tarefa agendada SYSTEM roda a cada 5 minutos + no boot + no logon
+- O script verifica se a rede HNS existe. Se sim, sai em <1 segundo (zero impacto)
+- Se a rede sumiu, recria automaticamente e reinicia o servico
+- O mentorado NUNCA precisa fazer nada — e 100% invisivel
+
+### 13a. Copiar scripts
+
+```
+powershell.exe -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force"
+mkdir -p ~/scripts
+cp REPO_PATH/scripts/fix-cowork.ps1 ~/scripts/fix-cowork.ps1
+cp REPO_PATH/scripts/register-task.ps1 ~/scripts/register-task.ps1
+```
+
+O modulo HNS e instalado automaticamente pelo register-task.ps1 (como admin, para todos os usuarios incluindo SYSTEM).
+
+### 13b. Registrar tarefa agendada (requer elevacao — unica vez)
+
+IMPORTANTE: ANTES de executar o comando abaixo, AVISE o mentorado com esta mensagem EXATA:
+
+---
+**Atencao:** Vou configurar uma protecao automatica para o Cowork.
+Vai aparecer uma janela do Windows pedindo permissao de administrador.
+**Clique em SIM** para autorizar. E a unica vez que isso vai aparecer.
+---
+
+AGUARDE o mentorado confirmar que entendeu (ou pelo menos 3 segundos) antes de executar.
+
+O register-task.ps1 cria uma tarefa SYSTEM que roda a cada 5 min, no boot e no logon.
+
+```
+powershell.exe -ExecutionPolicy Bypass -Command "Start-Process powershell -Verb RunAs -ArgumentList '-ExecutionPolicy Bypass -File REPO_PATH_WIN\scripts\register-task.ps1' -Wait"
+```
+
+(Substitua REPO_PATH_WIN pelo caminho Windows do repositorio, com barras invertidas)
+
+Verifique o resultado:
+```
+cat ~/scripts/register-task.result
+```
+
+Se contiver "OK", a tarefa foi registrada com sucesso. Informe: "Protecao do Cowork ativada com sucesso!"
+Se contiver "ERRO", informe o erro ao mentorado e sugira rodar manualmente depois.
+Se o mentorado negar o UAC, NAO insista. Informe que pode fazer depois rodando: `powershell -ExecutionPolicy Bypass -File scripts/setup-cowork-autofix.ps1`
+
+### 13c. Copiar atalho de emergencia para o Desktop
+
+O .bat usa auto-elevacao para casos onde o mentorado precisa forcar o fix manualmente:
+```
+cp REPO_PATH/scripts/fix-cowork.bat "DESKTOP_PATH/Consertar Cowork.bat"
+```
+
+Informe: "Cowork autofix configurado! Roda automaticamente a cada 5 minutos. Voce nunca precisa fazer nada. Se por algum motivo o Cowork travar, tem um atalho 'Consertar Cowork' no Desktop como emergencia."
+
+## 14. Validacao final e resumo
+
+### 14a. Checklist
 
 Execute as seguintes verificacoes e marque cada uma:
 - [ ] Node.js instalado (node --version)
 - [ ] Caminho do Node.js detectado (NODE_PATH)
 - [ ] Pasta Documentos encontrada e acessivel
-- [ ] Estrutura de pastas criada (Consultorias, Ventures, Metodos, _Misc)
-- [ ] CLAUDE.md existe na raiz de Documentos
-- [ ] Templates copiados para _templates/ (4 arquivos)
-- [ ] Indices criados em _overview/ (2 arquivos)
+- [ ] Pasta Desktop encontrada e acessivel
+- [ ] _knowledge/ criado com index.md (mapa da estrutura)
+- [ ] _gerados/ criado (destino padrao)
+- [ ] CLAUDE.md existe na pasta Desktop (instrucoes do Cowork)
+- [ ] Templates copiados para _knowledge/templates/ (4 arquivos)
 - [ ] MCP server instalado (npm install em mcp-server/)
 - [ ] Skills instalados em ~/.claude/skills/ (~30 skills)
 - [ ] MCP filesystem configurado no Claude Desktop (com caminhos dinamicos)
 - [ ] MCP claude-code configurado no Claude Desktop (com caminhos dinamicos)
-- [ ] Trusted folders configurado para Cowork
+- [ ] Trusted folders configurado (Desktop + Documentos)
 - [ ] Permissoes do Claude Code configuradas
-- [ ] Instrucoes globais do Cowork configuradas (passo manual)
+- [ ] Watcher instalado e rodando (index.md sendo atualizado)
+- [ ] Watcher configurado para auto-start com o sistema
+- [ ] (Windows) Cowork autofix instalado (tarefa agendada + atalho no Desktop)
 
-## 13. Configurar instrucoes do Cowork
-
-IMPORTANTE: Claude Desktop/Cowork NAO le o CLAUDE.md automaticamente. E necessario configurar as instrucoes globais do Cowork via interface.
-
-Mostre ao usuario o texto abaixo e peca para ele colar em Settings > Cowork > Global instructions (clicar em "Edit" ao lado de "Global instructions"):
-
-```
-Voce tem dois MCPs: filesystem (ler/escrever arquivos) e claude-code (executar codigo, skills, automacoes).
-
-REGRAS:
-1. Quando eu mencionar que baixei, recebi ou tenho um arquivo novo: IMEDIATAMENTE liste minha pasta Downloads via filesystem, encontre o arquivo mais recente, leia e processe. NAO peca para arrastar ou anexar.
-2. Para tarefas simples (ler, listar, mover arquivos): use filesystem.
-3. Para gerar documentos (Word, PDF, Excel, PowerPoint, landing pages, graficos): use claude-code. Ele tem skills especializados.
-4. Salve arquivos gerados na minha pasta Documentos. Se mencionei um cliente, salve em Consultorias/{cliente}/. Se nao, salve em _Gerados/.
-5. Apos gerar um arquivo, leia-o via filesystem e mostre o conteudo quando possivel.
-6. Para graficos, peca ao claude-code para gerar HTML com Chart.js (nao PNG).
-7. Nunca pergunte qual ferramenta usar. Decida automaticamente.
-```
-
-Alem disso, peca ao usuario para selecionar a pasta Documentos como pasta do Cowork (se ainda nao estiver selecionada).
-
-## 14. Mostrar resumo
+### 14b. Mostrar resumo
 
 Apresente um resumo claro do que foi feito:
 
@@ -667,52 +816,71 @@ Apresente um resumo claro do que foi feito:
 
 Sistema operacional: [SO]
 Pasta Documentos: [caminho]
+Pasta Desktop: [caminho]
 Node.js: [versao]
 
 O que foi configurado:
-  - Estrutura de pastas do segundo cerebro
-  - CLAUDE.md (contexto permanente para a IA)
+  - Knowledge base (_knowledge/index.md com mapa dos seus arquivos)
+  - Watcher automatico (mantem o indice atualizado em tempo real)
+  - CLAUDE.md no Desktop (instrucoes do Cowork)
   - Templates padrao (contrato, reuniao, decisao, perfil)
   - ~30 skills prontos (documentos, design, landing pages,
     ads, roteiros, email marketing, SEO, social media, e mais)
   - MCP filesystem (Claude Desktop le/escreve seus arquivos)
   - MCP claude-code (Cowork pode acionar o Claude Code)
-  - Roteamento automatico (skills-first)
-  - Trusted folders (Cowork trabalha sem pedir permissao)
+  - Trusted folders (Desktop + Documentos)
   - Permissoes do Claude Code (executa sem interrupcoes)
-  - Instrucoes globais do Cowork (comportamento proativo)
+  - (Windows) Cowork autofix (previne erro de timeout)
 
 =============================================
-  PROXIMO PASSO
+  COMO TRABALHAR NO DIA A DIA
 =============================================
 
-1. Feche e reabra o Claude Desktop
+REGRA DE OURO: Sempre abra o Cowork com a pasta Desktop.
+O Cowork le as instrucoes do CLAUDE.md dessa pasta e sabe
+exatamente o que fazer com cada pedido.
 
-2. Teste no Claude Desktop:
-   "liste os arquivos da minha pasta Documentos"
-   Se listar, esta tudo funcionando!
+Voce NAO precisa abrir o terminal. Tudo e pelo Cowork.
 
-3. Experimente pedir (tudo pelo Claude Desktop):
-   - "cria uma apresentacao sobre [tema]"
-   - "faz uma landing page pro meu produto"
-   - "analisa essa planilha" (arraste o arquivo)
-   - "cria uma proposta comercial em PDF"
-   - "gera 5 variacoes de copy pra um anuncio"
-   - "cria um roteiro de video de 60 segundos"
+COMO USAR O COWORK:
+  1. Abra o Claude Desktop
+  2. Va na aba Cowork
+  3. Selecione a pasta Desktop (so precisa fazer 1 vez)
+  4. Peca o que precisar — o Cowork decide sozinho
+     se usa filesystem ou claude-code
 
-4. Para processar documentos:
-   "processe os arquivos novos de Downloads"
+EXEMPLOS DO QUE VOCE PODE PEDIR:
+  - "cria uma apresentacao sobre [tema]"
+  - "faz uma landing page pro meu produto"
+  - "cria uma proposta comercial em PDF"
+  - "gera 5 variacoes de copy pra um anuncio"
+  - "cria um roteiro de video de 60 segundos"
+  - "monta um calendario de conteudo pro mes"
+  - "analisa meus concorrentes"
+  - "cria uma sequencia de emails de lancamento"
 
-DICA: Use o Cowork para tarefas mais longas.
-      Ele trabalha em background enquanto voce faz outras coisas.
+PROCESSAMENTO AUTOMATICO:
+  O Watcher roda em background e detecta automaticamente
+  quando voce baixa ou cria um arquivo novo. Ele le o
+  conteudo, cria um resumo em _knowledge/topics/, e
+  organiza o arquivo na pasta correta quando possivel.
+  Voce nao precisa fazer nada — e 100% automatico.
 
-Voce NAO precisa abrir o terminal no dia a dia.
-Tudo e feito pelo Claude Desktop / Cowork.
+ONDE FICAM SEUS ARQUIVOS:
+  Seus arquivos continuam onde sempre estiveram.
+  O Claude conhece sua estrutura pelo indice em
+  _knowledge/index.md e sabe onde colocar cada coisa.
+  Arquivos sem contexto vao para _gerados/.
+
+INSTRUCOES DO COWORK:
+  As instrucoes ficam no arquivo CLAUDE.md da pasta Desktop.
+  Voce pode ver e editar pela sidebar do Cowork
+  (clique em "Instrucoes" no painel lateral direito).
 
 Skills instalados (~30, o Claude usa automaticamente):
 
   Documentos: docx, pdf, pptx, xlsx
-  Design: canvas-design, frontend-design, brand-guidelines, theme-factory
+  Design: canvas-design, frontend-design, brand-guidelines
   Web: web-artifacts-builder, landing-page, frontend-slides
   Marketing: ad-copy, social-media-post, seo-content, content-calendar
   Video: video-script
